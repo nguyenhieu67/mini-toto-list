@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
 
+import { data } from "./data";
+
 function App() {
+  const saveLang = localStorage.getItem("myAppLang") || "jp";
+
+  const [lang, setLang] = useState(saveLang);
+
+  useEffect(() => {
+    localStorage.setItem("myAppLang", lang);
+  }, [lang]);
+
+  const d = data[lang] || data["jp"];
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
     return saved ? JSON.parse(saved) : [];
@@ -29,9 +41,7 @@ function App() {
     if (!value) return;
 
     if (isDuplicateTask(value)) {
-      alert(
-        "Task with this title already exists! Please use a different title.",
-      );
+      alert(`${d.notification.duplicateTitle}!`);
       return;
     }
 
@@ -57,21 +67,19 @@ function App() {
   const editTask = (id) => {
     const newTask = tasks.map((task) => {
       if (task.id === id) {
-        let newTitle = prompt("Enter the new task title", task.title);
+        let newTitle = prompt(`${d.notification.editTitle}`, task.title);
 
         if (newTitle === null) return task;
 
         newTitle = newTitle.trim();
 
         if (!newTitle) {
-          alert("Task title cannot be empty!");
+          alert(`${d.notification.emptyTitle}!`);
           return task;
         }
 
         if (isDuplicateTask(newTitle, id)) {
-          alert(
-            "Task with this title already exists! Please use a different task title!",
-          );
+          alert(`${d.notification.duplicateTitle}!`);
           return task;
         }
 
@@ -88,7 +96,7 @@ function App() {
     const taskToDelete = tasks.find((task) => task.id === id);
     if (
       taskToDelete &&
-      confirm(`Aru you sure you want to delete "${taskToDelete.title}"?`)
+      confirm(`${d.notification.deleteTask} "${taskToDelete.title}"?`)
     ) {
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
     }
@@ -96,14 +104,29 @@ function App() {
 
   return (
     <div className="flex justify-center">
+      <div className="absolute top-2 right-2 flex gap-2 rounded-lg bg-slate-800 p-1">
+        <button
+          onClick={() => setLang("en")}
+          className={`rounded px-1 py-1 md:px-3 ${lang === "en" ? "bg-emerald-500" : ""}`}
+        >
+          EN
+        </button>
+        <button
+          onClick={() => setLang("jp")}
+          className={`rounded px-1 py-1 md:px-3 ${lang === "jp" ? "bg-emerald-500" : ""}`}
+        >
+          JP
+        </button>
+      </div>
+
       <main className="max-w-150 flex-1 p-4 sm:p-12.5">
-        <h1 className="text-center text-2xl font-bold sm:text-left">
-          Create your Todo-List
+        <h1 className="mt-10 text-center text-2xl font-bold sm:mt-0 sm:text-left">
+          {d.heading}
         </h1>
         <form className="mt-7.5 flex gap-2.5" onSubmit={addTask}>
           <input
             type="text"
-            placeholder="What are your tasks for today?"
+            placeholder={`${d.inputPlaceholder}?`}
             value={inputValue}
             spellCheck="false"
             className="flex-1 rounded-lg border border-solid border-[#ffffff] bg-transparent px-3 py-2 font-medium"
@@ -117,7 +140,7 @@ function App() {
             type="submit"
             className="shrink-0 cursor-pointer rounded-lg border border-solid border-[#ffffff] bg-transparent px-3 py-2 font-medium"
           >
-            Add
+            {d.buttonTitle}
           </button>
         </form>
         <ul className="mt-7.5 flex flex-col gap-2.5">
@@ -137,19 +160,19 @@ function App() {
                     onClick={() => editTask(task.id)}
                     className="text-sm font-medium text-[#50ad7e]"
                   >
-                    EDIT
+                    {d.actionBtn[0]}
                   </button>
                   <button
                     onClick={() => toggleTask(task.id)}
                     className="text-sm font-medium text-[#ea9652]"
                   >
-                    {task.completed ? "MARK AS UNDONE" : "MARK AS DONE"}
+                    {task.completed ? d.actionBtn[1][1] : d.actionBtn[1][0]}
                   </button>
                   <button
                     onClick={() => deleteTask(task.id)}
                     className="text-sm font-medium text-[#a13538]"
                   >
-                    DELETE
+                    {d.actionBtn[2]}
                   </button>
                 </div>
 
@@ -159,20 +182,20 @@ function App() {
                       onClick={() => editTask(task.id)}
                       className="text-sm font-medium text-[#50ad7e]"
                     >
-                      EDIT
+                      {d.actionBtn[0]}
                     </button>
                     <button
                       onClick={() => deleteTask(task.id)}
                       className="text-sm font-medium text-[#a13538]"
                     >
-                      DELETE
+                      {d.actionBtn[2]}
                     </button>
                   </div>
                   <button
                     onClick={() => toggleTask(task.id)}
                     className="text-sm font-medium text-[#ea9652]"
                   >
-                    {task.completed ? "MARK AS UNDONE" : "MARK AS DONE"}
+                    {task.completed ? d.actionBtn[1][1] : d.actionBtn[1][0]}
                   </button>
                 </div>
               </li>
@@ -180,9 +203,7 @@ function App() {
           })}
 
           {tasks.length === 0 && (
-            <li className="text-center text-[#888888] italic">
-              No tasks available.
-            </li>
+            <li className="text-center text-[#888888] italic">{d.emptyMsg}.</li>
           )}
         </ul>
       </main>
