@@ -96,8 +96,10 @@ function App() {
 
   return (
     <div className="flex justify-center">
-      <main className="max-w-150 flex-1 p-12.5">
-        <h1 className="text-2xl font-bold">Create your Todo-List</h1>
+      <main className="max-w-150 flex-1 p-4 sm:p-12.5">
+        <h1 className="text-center text-2xl font-bold sm:text-left">
+          Create your Todo-List
+        </h1>
         <form className="mt-7.5 flex gap-2.5" onSubmit={addTask}>
           <input
             type="text"
@@ -123,14 +125,14 @@ function App() {
             return (
               <li
                 key={task.id}
-                className={`${task.completed ? "opacity-60" : ""} flex rounded-lg border border-solid border-[#ea9652] px-3 py-2`}
+                className={`${task.completed ? "opacity-60" : ""} flex items-center rounded-lg border border-solid border-[#ea9652] px-3 py-2`}
               >
                 <span
-                  className={`${task.completed ? "line-through" : ""} flex-1`}
+                  className={`${task.completed ? "line-through" : ""} flex-1 break-all`}
                 >
                   {task.title}
                 </span>
-                <div className="flex gap-4">
+                <div className="hidden gap-4 sm:flex">
                   <button
                     onClick={() => editTask(task.id)}
                     className="text-sm font-medium text-[#50ad7e]"
@@ -148,6 +150,29 @@ function App() {
                     className="text-sm font-medium text-[#a13538]"
                   >
                     DELETE
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-4 sm:hidden">
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => editTask(task.id)}
+                      className="text-sm font-medium text-[#50ad7e]"
+                    >
+                      EDIT
+                    </button>
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      className="text-sm font-medium text-[#a13538]"
+                    >
+                      DELETE
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => toggleTask(task.id)}
+                    className="text-sm font-medium text-[#ea9652]"
+                  >
+                    {task.completed ? "MARK AS UNDONE" : "MARK AS DONE"}
                   </button>
                 </div>
               </li>
